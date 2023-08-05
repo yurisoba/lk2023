@@ -348,8 +348,10 @@ struct treeint *treeint_insert(int a)
 {
     struct st_node *p = NULL;
     enum st_dir d;
+    // iterative traversal, p will be the root where we insert into
     for (struct st_node *n = st_root(tree); n;) {
         struct treeint *t = container_of(n, struct treeint, st_n);
+        // this means we do not insert if an existing node with the same value already exists
         if (a == t->value)
             return t;
 
