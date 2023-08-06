@@ -12,7 +12,7 @@ struct rb_node *rb_red_parent(struct rb_node *red)
 void rb_set_parent_color(struct rb_node *rb, struct rb_node *p, int color)
 {
 	// https://lore.kernel.org/all/20230404221350.3806566-1-goldstein.w.n@gmail.com/T/#u
-	rb->__rb_parent_color = (unsigned long)p + color;
+	rb->__rb_parent_color = (uintptr)p + color;
 }
 
 /*

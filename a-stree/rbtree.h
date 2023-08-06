@@ -16,9 +16,11 @@
  * with.
  */
 
+typedef unsigned long long uintptr;
+
 struct rb_node {
 	// parent color packs both parent and color
-	unsigned long __rb_parent_color;
+	uintptr __rb_parent_color;
 	struct rb_node *rb_right;
 	struct rb_node *rb_left;
 }; // __attribute__((aligned(sizeof(long))));
@@ -41,7 +43,7 @@ enum rb_dir {
 static inline void rb_link_node(struct rb_node *node, struct rb_node *parent,
 	struct rb_node **rb_link)
 {
-	node->__rb_parent_color = (unsigned long)parent;
+	node->__rb_parent_color = (uintptr)parent;
 	node->rb_left = node->rb_right = NULL;
 
 	*rb_link = node;
