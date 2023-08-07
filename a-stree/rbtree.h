@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stddef.h>
+#include <stdint.h>
 
 /*
  * Code is yanked out from <linux/rbtree.h>, with thread-safe facilities
@@ -16,11 +17,9 @@
  * with.
  */
 
-typedef unsigned long long uintptr;
-
 struct rb_node {
 	// parent color packs both parent and color
-	uintptr __rb_parent_color;
+	uintptr_t __rb_parent_color;
 	struct rb_node *rb_right;
 	struct rb_node *rb_left;
 }; // __attribute__((aligned(sizeof(long))));
@@ -43,7 +42,7 @@ enum rb_dir {
 static inline void rb_link_node(struct rb_node *node, struct rb_node *parent,
 	struct rb_node **rb_link)
 {
-	node->__rb_parent_color = (uintptr)parent;
+	node->__rb_parent_color = (uintptr_t)parent;
 	node->rb_left = node->rb_right = NULL;
 
 	*rb_link = node;
