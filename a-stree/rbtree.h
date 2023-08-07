@@ -49,6 +49,7 @@ static inline void rb_link_node(struct rb_node *node, struct rb_node *parent,
 }
 
 void rb_insert_color(struct rb_node *node, struct rb_root *root);
+void rb_erase(struct rb_node *node, struct rb_root *root);
 
 #define RB_RED   0
 #define RB_BLACK 1

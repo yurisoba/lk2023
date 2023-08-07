@@ -50,6 +50,34 @@ struct treeint *treeint_insert(int a)
 	return i;
 }
 
+struct treeint *treeint_find(int a)
+{
+	struct rb_node *n = tree->rb_node;
+	while (n) {
+		struct treeint *t = treeint_entry(n);
+		if (a == t->value)
+			return t;
+
+		if (a < t->value)
+			n = n->rb_left;
+		else if (a > t->value)
+			n = n->rb_right;
+	}
+
+	return 0;
+}
+
+int treeint_remove(int a)
+{
+	struct treeint *n = treeint_find(a);
+	if (!n)
+		return -1;
+
+	rb_erase(&n->st_n, tree);
+	free(n);
+	return 0;
+}
+
 // Q: why static?
 static void __treeint_dump(struct rb_node *n, int depth)
 {
@@ -114,6 +142,28 @@ void treeint_pretty_dump(void)
 	fclose(f);
 }
 
+static void __treeint_destroy(struct rb_node *n)
+{
+	if (n->rb_left)
+		__treeint_destroy(n->rb_left);
+
+	if (n->rb_right)
+		__treeint_destroy(n->rb_right);
+
+	struct treeint *i = treeint_entry(n);
+	free(i);
+}
+
+int treeint_destroy(void)
+{
+	assert(tree);
+	if (tree->rb_node)
+		__treeint_destroy(tree->rb_node);
+
+	free(tree);
+	return 0;
+}
+
 int main(void)
 {
 	srand(time(0));
@@ -125,6 +175,21 @@ int main(void)
 
 	printf("[ After insertions ]\n");
 	treeint_pretty_dump();
+
+	printf("Removing...\n");
+	for (int i = 0; i < 100; ++i) {
+		int v = rand() % 99;
+		printf("%2d  ", v);
+		if ((i + 1) % 10 == 0)
+			printf("\n");
+		treeint_remove(v);
+	}
+	printf("\n");
+
+	printf("[ After removals ]\n");
+	treeint_pretty_dump();
+
+	treeint_destroy();
 
 	return 0;
 }
