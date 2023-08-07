@@ -78,11 +78,17 @@ static void __treeint_pretty_dump(struct rb_node *n, FILE *f)
 	struct treeint *v = treeint_entry(n);
 	if (n->rb_left) {
 		struct treeint *c = treeint_entry(n->rb_left);
-		fprintf(f, "  %d -- %d [label=L%s];\n", v->value, c->value,
+		fprintf(f, "  %d [fontcolor=white, fillcolor=%s];\n",
+			c->value, rb_is_red(n->rb_left) ? "red" : "black");
+		fprintf(f, "  %d -- %d [label=L%s];\n",
+			v->value,
+			c->value,
 			(n->rb_right) ? "" : ",side=L");
 	}
 	if (n->rb_right) {
 		struct treeint *c = treeint_entry(n->rb_right);
+		fprintf(f, "  %d [fontcolor=white, fillcolor=%s];\n",
+			c->value, rb_is_red(n->rb_right) ? "red" : "black");
 		fprintf(f, "  %d -- %d [label=R%s];\n", v->value, c->value,
 			(n->rb_left) ? "" : ",side=R");
 	}
@@ -96,7 +102,12 @@ void treeint_pretty_dump(void)
 	FILE *f = fopen("tree.gv", "w");
 	fprintf(f, "%s",
 		"graph{\n"
-		"  node [shape=circle]\n");
+		"  node [shape=circle, style=filled]\n");
+	if (tree->rb_node) {
+		struct treeint *v = treeint_entry(tree->rb_node);
+		fprintf(f, "  %d [fontcolor=white, fillcolor=%s]\n",
+			v->value, rb_is_red(tree->rb_node) ? "red" : "black");
+	}
 	__treeint_pretty_dump(tree->rb_node, f);
 	fprintf(f, "%s",
 		"}\n");
