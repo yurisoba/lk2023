@@ -20,7 +20,7 @@ struct treeint {
 
 static struct rb_root *tree = {NULL};
 
-int treeint_init()
+int treeint_init(void)
 {
 	tree = calloc(sizeof(struct rb_root), 1);
 	assert(tree);
@@ -65,7 +65,7 @@ static void __treeint_dump(struct rb_node *n, int depth)
 	__treeint_dump(n->rb_right, depth + 1);
 }
 
-void treeint_dump()
+void treeint_dump(void)
 {
 	__treeint_dump(tree->rb_node, 0);
 }
@@ -103,7 +103,7 @@ void treeint_pretty_dump(void)
 	fclose(f);
 }
 
-int main()
+int main(void)
 {
 	srand(time(0));
 
