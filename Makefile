@@ -1,4 +1,4 @@
-CFLAGS := -Wall -Werror -Wpedantic
+CFLAGS := -Wall -Werror
 
 stree: a-stree/main.c
 	$(CC) $(CFLAGS) $^ -o $@

@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include <assert.h>
 #include <errno.h>
 #include <pthread.h>
@@ -178,6 +179,7 @@ void qsort_mt(void *a,
 		if (bailout) {
 			verify(pthread_mutex_lock(&qs->mtx_st));
 			qs->st = ts_term;
+			// change to broadcast?
 			verify(pthread_cond_signal(&qs->cond_st));
 			verify(pthread_mutex_unlock(&qs->mtx_st));
 		}
@@ -340,8 +342,9 @@ static void *qsort_thread(void *p)
 	again:
 	/* Wait for work to be allocated. */
 	verify(pthread_mutex_lock(&qs->mtx_st));
+	// st will be set to ts_work / ts_term before pthread_cond_signal()
 	while (qs->st == ts_idle)
-		verify(HHHH);
+		verify(pthread_cond_wait(&qs->cond_st, &qs->mtx_st));
 	verify(pthread_mutex_unlock(&qs->mtx_st));
 	if (qs->st == ts_term) {
 		return NULL;
@@ -360,7 +363,8 @@ static void *qsort_thread(void *p)
 				continue;
 			verify(pthread_mutex_lock(&qs2->mtx_st));
 			qs2->st = ts_term;
-			verify(JJJJ);
+			// wake idle threads
+			verify(pthread_cond_signal(&qs2->cond_st));
 			verify(pthread_mutex_unlock(&qs2->mtx_st));
 		}
 		verify(pthread_mutex_unlock(&c->mtx_al));
