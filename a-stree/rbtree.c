@@ -1,6 +1,6 @@
 #include "rbtree.h"
 
-struct rb_node *rb_red_parent(struct rb_node *red)
+static inline struct rb_node *rb_red_parent(struct rb_node *red)
 {
 	return (struct rb_node *)red->__rb_parent_color;
 }
@@ -9,7 +9,7 @@ struct rb_node *rb_red_parent(struct rb_node *red)
  * rb_set_parent sets p to be the parent of rb and retains the current
  * color of rb.
  */
-void rb_set_parent(struct rb_node *rb, struct rb_node *p)
+static inline void rb_set_parent(struct rb_node *rb, struct rb_node *p)
 {
 	rb->__rb_parent_color = rb_color(rb) + (uintptr_t)p;
 }
@@ -18,13 +18,14 @@ void rb_set_parent(struct rb_node *rb, struct rb_node *p)
  * rb_set_parent_color updates rb's parent pointer without changing its
  * color.
  */
-void rb_set_parent_color(struct rb_node *rb, struct rb_node *p, int color)
+static inline void rb_set_parent_color(struct rb_node *rb, struct rb_node *p,
+	int color)
 {
 	// https://lore.kernel.org/all/20230404221350.3806566-1-goldstein.w.n@gmail.com/T/#u
 	rb->__rb_parent_color = (uintptr_t)p + color;
 }
 
-void rb_set_black(struct rb_node *rb)
+static inline void rb_set_black(struct rb_node *rb)
 {
 	rb->__rb_parent_color |= RB_BLACK;
 }
@@ -34,7 +35,7 @@ void rb_set_black(struct rb_node *rb)
  * does not exist, update the root instead. Only one of the parent
  * children can be old.
  */
-void __rb_change_child(struct rb_node *old, struct rb_node *new,
+static inline void __rb_change_child(struct rb_node *old, struct rb_node *new,
 	struct rb_node *parent, struct rb_root *root)
 {
 	if (parent) {
@@ -46,8 +47,8 @@ void __rb_change_child(struct rb_node *old, struct rb_node *new,
 		root->rb_node = new;
 }
 
-void __rb_rotate_set_parents(struct rb_node *old, struct rb_node *new,
-	struct rb_root *root, int color)
+static inline void __rb_rotate_set_parents(struct rb_node *old,
+	struct rb_node *new, struct rb_root *root, int color)
 {
 	struct rb_node *parent = rb_parent(old);
 	new->__rb_parent_color = old->__rb_parent_color;
@@ -186,7 +187,8 @@ void rb_insert_color(struct rb_node *node, struct rb_root *root)
 	}
 }
 
-struct rb_node *__rb_erase_stage1(struct rb_node *node, struct rb_root *root)
+static inline struct rb_node *__rb_erase_stage1(struct rb_node *node,
+	struct rb_root *root)
 {
 	struct rb_node *child = node->rb_right;
 	struct rb_node *tmp = node->rb_left;
@@ -276,7 +278,8 @@ struct rb_node *__rb_erase_stage1(struct rb_node *node, struct rb_root *root)
 	return rebalance;
 }
 
-void __rb_erase_color(struct rb_node *parent, struct rb_root *root)
+static inline void __rb_erase_color(struct rb_node *parent,
+	struct rb_root *root)
 {
 	struct rb_node *node = NULL, *sibling, *tmp1, *tmp2;
 

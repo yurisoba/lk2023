@@ -164,30 +164,20 @@ int treeint_destroy(void)
 	return 0;
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
-	srand(time(0));
+	int seed = atoi(argv[2]);
+	int ncount = atoi(argv[1]);
+
+	srand(seed);
 
 	treeint_init();
 
-	for (int i = 0; i < 100; ++i)
-		treeint_insert(rand() % 99);
+	for (int i = 0; i < ncount; ++i)
+		treeint_insert(rand());
 
-	printf("[ After insertions ]\n");
-	treeint_pretty_dump();
-
-	printf("Removing...\n");
-	for (int i = 0; i < 100; ++i) {
-		int v = rand() % 99;
-		printf("%2d  ", v);
-		if ((i + 1) % 10 == 0)
-			printf("\n");
-		treeint_remove(v);
-	}
-	printf("\n");
-
-	printf("[ After removals ]\n");
-	treeint_pretty_dump();
+	for (int i = 0; i < ncount; ++i)
+		treeint_remove(rand());
 
 	treeint_destroy();
 
