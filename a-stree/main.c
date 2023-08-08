@@ -38,16 +38,18 @@
  * of the longest chain of nodes under the node to which the hint is attached.
  */
 struct st_node {
-    short hint;
-    struct st_node *parent;
-    struct st_node *left, *right;
+	short hint;
+	struct st_node *parent;
+	struct st_node *left, *right;
 };
 
 struct st_root {
-    struct st_node *root;
+	struct st_node *root;
 };
 
-enum st_dir { LEFT, RIGHT };
+enum st_dir {
+	LEFT, RIGHT
+};
 
 #define st_root(r) (r->root)
 #define st_left(n) (n->left)
@@ -58,108 +60,106 @@ enum st_dir { LEFT, RIGHT };
 
 struct st_node *st_first(struct st_node *n)
 {
-    if (!st_left(n))
-        return n;
+	if (!st_left(n))
+		return n;
 
-    return st_first(st_left(n));
+	return st_first(st_left(n));
 }
 
 struct st_node *st_last(struct st_node *n)
 {
-    if (!st_right(n))
-        return n;
+	if (!st_right(n))
+		return n;
 
-    return st_last(st_right(n));
+	return st_last(st_right(n));
 }
 
 static inline void st_rotate_left(struct st_node *n)
 {
-    struct st_node *l = st_left(n), *p = st_parent(n);
+	struct st_node *l = st_left(n), *p = st_parent(n);
 
-    st_parent(l) = st_parent(n);
-    st_left(n) = st_right(l);
-    st_parent(n) = l;
-    st_right(l) = n;
+	st_parent(l) = st_parent(n);
+	st_left(n) = st_right(l);
+	st_parent(n) = l;
+	st_right(l) = n;
 
-    if (p && st_left(p) == n)
-        st_left(p) = l;
-    else if (p)
-        st_right(p) = l;
+	if (p && st_left(p) == n)
+		st_left(p) = l;
+	else if (p)
+		st_right(p) = l;
 
-    if (st_left(n))
-        st_lparent(n) = n;
+	if (st_left(n))
+		st_lparent(n) = n;
 }
 
 static inline void st_rotate_right(struct st_node *n)
 {
-    struct st_node *r = st_right(n), *p = st_parent(n);
+	struct st_node *r = st_right(n), *p = st_parent(n);
 
-    st_parent(r) = st_parent(n);
-    st_right(n) = st_left(r);
-    st_parent(n) = r;
-    st_left(r) = n;
+	st_parent(r) = st_parent(n);
+	st_right(n) = st_left(r);
+	st_parent(n) = r;
+	st_left(r) = n;
 
-    if (p && st_left(p) == n)
-        st_left(p) = r;
-    else if (p)
-        st_right(p) = r;
+	if (p && st_left(p) == n)
+		st_left(p) = r;
+	else if (p)
+		st_right(p) = r;
 
-    if (st_right(n))
-        st_rparent(n) = n;
+	if (st_right(n))
+		st_rparent(n) = n;
 }
 
 static inline int st_balance(struct st_node *n)
 {
-    int l = 0, r = 0;
+	int l = 0, r = 0;
 
-    if (st_left(n))
-        l = st_left(n)->hint + 1;
+	if (st_left(n))
+		l = st_left(n)->hint + 1;
 
-    if (st_right(n))
-        r = st_right(n)->hint + 1;
+	if (st_right(n))
+		r = st_right(n)->hint + 1;
 
-    return l - r;
+	return l - r;
 }
 
 static inline int st_max_hint(struct st_node *n)
 {
-    int l = 0, r = 0;
+	int l = 0, r = 0;
 
-    if (st_left(n))
-        l = st_left(n)->hint + 1;
+	if (st_left(n))
+		l = st_left(n)->hint + 1;
 
-    if (st_right(n))
-        r = st_right(n)->hint + 1;
+	if (st_right(n))
+		r = st_right(n)->hint + 1;
 
-    return l > r ? l : r;
+	return l > r ? l : r;
 }
 
 static inline void st_update(struct st_node **root, struct st_node *n)
 {
-    if (!n)
-        return;
+	if (!n)
+		return;
 
-    int b = st_balance(n);
-    int prev_hint = n->hint;
-    struct st_node *p = st_parent(n);
+	int b = st_balance(n);
+	int prev_hint = n->hint;
+	struct st_node *p = st_parent(n);
 
-    if (b < -1) {
-        /* leaning to the right */
-        if (n == *root)
-            *root = st_right(n);
-        st_rotate_right(n);
-    }
+	if (b < -1) {
+		/* leaning to the right */
+		if (n == *root)
+			*root = st_right(n);
+		st_rotate_right(n);
+	} else if (b > 1) {
+		/* leaning to the left */
+		if (n == *root)
+			*root = st_left(n);
+		st_rotate_left(n);
+	}
 
-    else if (b > 1) {
-        /* leaning to the left */
-        if (n == *root)
-            *root = st_left(n);
-        st_rotate_left(n);
-    }
-
-    n->hint = st_max_hint(n);
-    if (n->hint == 0 || n->hint != prev_hint)
-        st_update(root, p);
+	n->hint = st_max_hint(n);
+	if (n->hint == 0 || n->hint != prev_hint)
+		st_update(root, p);
 }
 
 /* The process of insertion is straightforward and follows the standard approach
@@ -168,77 +168,77 @@ static inline void st_update(struct st_node **root, struct st_node *n)
  * inserted node.
  */
 void st_insert(struct st_node **root,
-               struct st_node *p,
-               struct st_node *n,
-               enum st_dir d)
+	struct st_node *p,
+	struct st_node *n,
+	enum st_dir d)
 {
-    if (d == LEFT)
-        st_left(p) = n;
-    else
-        st_right(p) = n;
+	if (d == LEFT)
+		st_left(p) = n;
+	else
+		st_right(p) = n;
 
-    st_parent(n) = p;
-    st_update(root, n);
+	st_parent(n) = p;
+	st_update(root, n);
 }
 
 static inline void st_replace_right(struct st_node *n, struct st_node *r)
 {
-    struct st_node *p = st_parent(n), *rp = st_parent(r);
+	struct st_node *p = st_parent(n), *rp = st_parent(r);
 
-    if (st_left(rp) == r) {
-        st_left(rp) = st_right(r);
-        if (st_right(r))
-            st_rparent(r) = rp;
-    }
+	if (st_left(rp) == r) {
+		st_left(rp) = st_right(r);
+		if (st_right(r))
+			st_rparent(r) = rp;
+	}
 
-    if (st_parent(rp) == n)
-        st_parent(rp) = r;
+	if (st_parent(rp) == n)
+		st_parent(rp) = r;
 
-    st_parent(r) = p;
-    st_left(r) = st_left(n);
+	st_parent(r) = p;
+	st_left(r) = st_left(n);
 
-    if (st_right(n) != r) {
-        st_right(r) = st_right(n);
-        st_rparent(n) = r;
-    }
+	if (st_right(n) != r) {
+		st_right(r) = st_right(n);
+		st_rparent(n) = r;
+	}
 
-    if (p && st_left(p) == n)
-        st_left(p) = r;
-    else if (p)
-        st_right(p) = r;
+	if (p && st_left(p) == n)
+		st_left(p) = r;
+	else if (p)
+		st_right(p) = r;
 
-    if (st_left(n))
-        st_lparent(n) = r;
+	if (st_left(n))
+		st_lparent(n) = r;
 }
 
 static inline void st_replace_left(struct st_node *n, struct st_node *l)
 {
-    struct st_node *p = st_parent(n), *lp = st_parent(l);
+	struct st_node *p = st_parent(n), *lp = st_parent(l);
 
-    if (st_right(lp) == l) {
-        st_right(lp) = st_left(l);
-        if (st_left(l))
-            st_lparent(l) = lp;
-    }
+	if (st_right(lp) == l) {
+		st_right(lp) = st_left(l);
+		if (st_left(l))
+			st_lparent(l) = lp;
+	}
 
-    if (st_parent(lp) == n)
-        st_parent(lp) = l;
+	if (st_parent(lp) == n)
+		st_parent(lp) = l;
 
-    st_parent(l) = p;
-    st_right(l) = st_right(n);
+	st_parent(l) = p;
+	st_right(l) = st_right(n);
 
-    if (st_left(n) != l) {
-        st_left(l) = st_left(n);
-        st_lparent(n) = l;
-    }
+	if (st_left(n) != l) {
+		st_left(l) = st_left(n);
+		st_lparent(n) = l;
+	}
 
-    if (p && st_left(p) == n)
-        st_left(p) = l;
-    else if (p)
-        st_right(p) = l;
+	if (p && st_left(p) == n)
+		st_left(p) = l;
+	else if (p)
+		st_right(p) = l;
 
-    if (st_right(n))
-        st_rparent(n) = l;
+	if (st_right(n))
+		st_rparent(n) = l;
 }
 
 /* The process of deletion in this tree structure is relatively more intricate,
@@ -259,40 +259,40 @@ static inline void st_replace_left(struct st_node *n, struct st_node *l)
  */
 void st_remove(struct st_node **root, struct st_node *del)
 {
-    if (st_right(del)) {
-        struct st_node *least = st_first(st_right(del));
-        if (del == *root)
-            *root = least;
+	if (st_right(del)) {
+		struct st_node *least = st_first(st_right(del));
+		if (del == *root)
+			*root = least;
 
-        st_replace_right(del, least);
-        st_update(root, least);
-        return;
-    }
+		st_replace_right(del, least);
+		st_update(root, least);
+		return;
+	}
 
-    if (st_left(del)) {
-        struct st_node *most = st_last(st_left(del));
-        if (del == *root)
-            *root = most;
+	if (st_left(del)) {
+		struct st_node *most = st_last(st_left(del));
+		if (del == *root)
+			*root = most;
 
-        st_replace_left(del, most);
-        st_update(root, most);
-        return;
-    }
+		st_replace_left(del, most);
+		st_update(root, most);
+		return;
+	}
 
-    if (del == *root) {
-        *root = 0;
-        return;
-    }
+	if (del == *root) {
+		*root = 0;
+		return;
+	}
 
-    /* empty node */
-    struct st_node *parent = st_parent(del);
+	/* empty node */
+	struct st_node *parent = st_parent(del);
 
-    if (st_left(parent) == del)
-        st_left(parent) = 0;
-    else
-        st_right(parent) = 0;
+	if (st_left(parent) == del)
+		st_left(parent) = 0;
+	else
+		st_right(parent) = 0;
 
-    st_update(root, parent);
+	st_update(root, parent);
 }
 
 /* Test program */
@@ -309,146 +309,146 @@ void st_remove(struct st_node **root, struct st_node *del)
 #define treeint_entry(ptr) container_of(ptr, struct treeint, st_n)
 
 struct treeint {
-    int value;
-    struct st_node st_n;
+	int value;
+	struct st_node st_n;
 };
 
 static struct st_root *tree;
 
 int treeint_init()
 {
-    tree = calloc(sizeof(struct st_root), 1);
-    assert(tree);
-    return 0;
+	tree = calloc(sizeof(struct st_root), 1);
+	assert(tree);
+	return 0;
 }
 
 static void __treeint_destroy(struct st_node *n)
 {
-    if (st_left(n))
-        __treeint_destroy(st_left(n));
+	if (st_left(n))
+		__treeint_destroy(st_left(n));
 
-    if (st_right(n))
-        __treeint_destroy(st_right(n));
+	if (st_right(n))
+		__treeint_destroy(st_right(n));
 
-    struct treeint *i = treeint_entry(n);
-    free(i);
+	struct treeint *i = treeint_entry(n);
+	free(i);
 }
 
 int treeint_destroy()
 {
-    assert(tree);
-    if (st_root(tree))
-        __treeint_destroy(st_root(tree));
+	assert(tree);
+	if (st_root(tree))
+		__treeint_destroy(st_root(tree));
 
-    free(tree);
-    return 0;
+	free(tree);
+	return 0;
 }
 
 struct treeint *treeint_insert(int a)
 {
-    struct st_node *p = NULL;
-    enum st_dir d;
-    // iterative traversal, p will be the root where we insert into
-    for (struct st_node *n = st_root(tree); n;) {
-        struct treeint *t = container_of(n, struct treeint, st_n);
-        // this means we do not insert if an existing node with the same value already exists
-        if (a == t->value)
-            return t;
+	struct st_node *p = NULL;
+	enum st_dir d;
+	// iterative traversal, p will be the root where we insert into
+	for (struct st_node *n = st_root(tree); n;) {
+		struct treeint *t = container_of(n, struct treeint, st_n);
+		// this means we do not insert if an existing node with the same value already exists
+		if (a == t->value)
+			return t;
 
-        p = n;
+		p = n;
 
-        if (a < t->value) {
-            n = st_left(n);
-            d = LEFT;
-        } else if (a > t->value) {
-            n = st_right(n);
-            d = RIGHT;
-        }
-    }
+		if (a < t->value) {
+			n = st_left(n);
+			d = LEFT;
+		} else if (a > t->value) {
+			n = st_right(n);
+			d = RIGHT;
+		}
+	}
 
-    struct treeint *i = calloc(sizeof(struct treeint), 1);
-    if (st_root(tree))
-        st_insert(&st_root(tree), p, &i->st_n, d);
-    else
-        st_root(tree) = &i->st_n;
+	struct treeint *i = calloc(sizeof(struct treeint), 1);
+	if (st_root(tree))
+		st_insert(&st_root(tree), p, &i->st_n, d);
+	else
+		st_root(tree) = &i->st_n;
 
-    i->value = a;
-    return i;
+	i->value = a;
+	return i;
 }
 
 struct treeint *treeint_find(int a)
 {
-    struct st_node *n = st_root(tree);
-    while (n) {
-        struct treeint *t = treeint_entry(n);
-        if (a == t->value)
-            return t;
+	struct st_node *n = st_root(tree);
+	while (n) {
+		struct treeint *t = treeint_entry(n);
+		if (a == t->value)
+			return t;
 
-        if (a < t->value)
-            n = st_left(n);
-        else if (a > t->value)
-            n = st_right(n);
-    }
+		if (a < t->value)
+			n = st_left(n);
+		else if (a > t->value)
+			n = st_right(n);
+	}
 
-    return 0;
+	return 0;
 }
 
 int treeint_remove(int a)
 {
-    struct treeint *n = treeint_find(a);
-    if (!n)
-        return -1;
+	struct treeint *n = treeint_find(a);
+	if (!n)
+		return -1;
 
-    st_remove(&st_root(tree), &n->st_n);
-    free(n);
-    return 0;
+	st_remove(&st_root(tree), &n->st_n);
+	free(n);
+	return 0;
 }
 
 /* ascending order */
 static void __treeint_dump(struct st_node *n, int depth)
 {
-    if (!n)
-        return;
+	if (!n)
+		return;
 
-    __treeint_dump(st_left(n), depth + 1);
+	__treeint_dump(st_left(n), depth + 1);
 
-    struct treeint *v = treeint_entry(n);
-    printf("%d\n", v->value);
+	struct treeint *v = treeint_entry(n);
+	printf("%d\n", v->value);
 
-    __treeint_dump(st_right(n), depth + 1);
+	__treeint_dump(st_right(n), depth + 1);
 }
 
 void treeint_dump()
 {
-    __treeint_dump(st_root(tree), 0);
+	__treeint_dump(st_root(tree), 0);
 }
 
 int main()
 {
-    srand(time(0));
+	srand(time(0));
 
-    treeint_init();
+	treeint_init();
 
-    for (int i = 0; i < 100; ++i)
-        treeint_insert(rand() % 99);
+	for (int i = 0; i < 100; ++i)
+		treeint_insert(rand() % 99);
 
-    printf("[ After insertions ]\n");
-    treeint_dump();
+	printf("[ After insertions ]\n");
+	treeint_dump();
 
-    printf("Removing...\n");
-    for (int i = 0; i < 100; ++i) {
-        int v = rand() % 99;
-        printf("%2d  ", v);
-        if ((i + 1) % 10 == 0)
-            printf("\n");
-        treeint_remove(v);
-    }
-    printf("\n");
+	printf("Removing...\n");
+	for (int i = 0; i < 100; ++i) {
+		int v = rand() % 99;
+		printf("%2d  ", v);
+		if ((i + 1) % 10 == 0)
+			printf("\n");
+		treeint_remove(v);
+	}
+	printf("\n");
 
-    printf("[ After removals ]\n");
-    treeint_dump();
+	printf("[ After removals ]\n");
+	treeint_dump();
 
-    treeint_destroy();
+	treeint_destroy();
 
-    return 0;
+	return 0;
 }
